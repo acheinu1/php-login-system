@@ -13,7 +13,7 @@ if (isset($_POST["signupbtn"])) {
     if (empty($username) || empty($email) || empty($password) || empty($r_password)) {
         //if any field is empty line 16 redirects the user 
         //from signup.inc.php back to signup.php & returns username & email if filled alrdy
-        header("location:../signup.php?error=emptyfields&Userid=".$username."&email=".$email);
+        header("location:../signup.php?error=emptyfields&Userid=" . $username . "&email=" . $email);
         exit();
     }
     // line 20 validates both email and user name simultaneously
@@ -23,17 +23,17 @@ if (isset($_POST["signupbtn"])) {
     }
     // line 24 validates the email returns username
     else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        header("location:../signup.php?error=invalidemail&Userid=".$username);
+        header("location:../signup.php?error=invalidemail&Userid=" . $username);
         exit();
     }
     // line 30 validates the user name with REGEX returns email
     else if (!preg_match("/^[a-zA-Z0-9]*$/", $username)) {
-        header("location:../signup.php?error=invalideUserid&email=".$email);
+        header("location:../signup.php?error=invalideUserid&email=" . $email);
         exit();
     }
     // validates password match line 35
     else if ($password !== $r_password) {
-        header("location:../signup.php?error=yourpassworddoesnotmatch&Userid=".$username."&email=".$email);
+        header("location:../signup.php?error=yourpassworddoesnotmatch&Userid=" . $username . "&email=" . $email);
         exit();
     }
     // checks the database of the user name has been taken line 41
@@ -41,7 +41,7 @@ if (isset($_POST["signupbtn"])) {
     else {
         $sql = "SELECT Uidusers FROM users WHERE Uidusers=?";
         $stmt = mysqli_stmt_init($connect);
-        if (!mysqli_stmt_prepare($stmt,$sql)) {
+        if (!mysqli_stmt_prepare($sql, $stmt)) {
             header("location:../signup.php?error=sqlerror=");
             exit();
         } else {
@@ -50,16 +50,16 @@ if (isset($_POST["signupbtn"])) {
             mysqli_stmt_bind_param($stmt, 's', $username);
             mysqli_stmt_execute($stmt);
             //stores the username search result from the DB into $stmt
-            // mysqli_store_result($stmt);
+            mysqli_store_result($stmt);
             //checks how many results(i.e identical to $username) rows we got frm DB
             $resultCheck = mysqli_stmt_num_rows($stmt);
-            // dd($resultCheck);
+
             if ($resultCheck > 0) {
-                header("location:../signup.php?error=usernameisalreadytaken&mail=".$email);
+                header("location:../signup.php?error=usernameisalreadytaken&mail=" . $email);
                 exit();
             } else {
                 // if $resultCheck = 0 then insert the form data into DB using placeholders ???
-                $sql = "INSERT INTO users (Uidusers, emailusers, pwduser) VALUES (?, ?, ?)";
+                $sql = 'INSERT INTO users (Uidusers, emailusers, pwduser) VALUES (?, ?, ?)';
                 // we have to use prepared statements to assign
                 // (Uidusers,emailusers,pwduser) =($username, $email, $password)
                 $stmt = mysqli_stmt_init($connect);
@@ -70,7 +70,7 @@ if (isset($_POST["signupbtn"])) {
                     $hashedPWD = password_hash($password, PASSWORD_DEFAULT); //hashed the password
                     //else bind prepared statement to form vars ($username, $email, $password)
                     //which are 3 single string 'sss" // then execute the statement
-                    mysqli_stmt_bind_param($stmt, "sss", $username, $email, $hashedPWD);
+                    mysqli_stmt_bind_param($stmt, 'sss', $username, $email, $hashedPWD);
                     mysqli_stmt_execute($stmt);
                     // onces all the form data have been inserted into DB redirect back
                     // to signup with a success message
@@ -85,8 +85,7 @@ if (isset($_POST["signupbtn"])) {
 
     mysqli_stmt_close($stmt);  // to close all the DB statements
     mysqli_close($connect);     // closing the DB connection we earlier established in dbh.inc.php
-} 
-else {
+} else {
     // if user got into the this page(signup.inc.php)
     // without clicking the signup button take user back to signup.php  
     header("location:../signup.php?");
